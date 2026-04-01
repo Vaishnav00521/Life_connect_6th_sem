@@ -8,9 +8,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -18,39 +20,46 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().permitAll()
-                );
+            .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CRITICAL: Allow pre-flight
+                .requestMatchers("/api/**").permitAll() // Web API controllers
+                .requestMatchers("/ws-lifeconnect/**").permitAll() // WebSocket connections
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // API documentation
+                .anyRequest().authenticated()
+            )
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable());
+            
         return http.build();
     }
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         
-        String envUrl = System.getenv("FRONTEND_URL");
-        if (envUrl != null && !envUrl.isEmpty()) {
-            config.addAllowedOrigin(envUrl);
+        List<String> originPatterns = new ArrayList<>(Arrays.asList(
+            "https://*.vercel.app", 
+            "http://localhost:5173",
+            "http://localhost:5174"
+        ));
+        
+        String renderEnvOrigin = System.getenv("FRONTEND_URL");
+        if (renderEnvOrigin != null && !renderEnvOrigin.isBlank()) {
+            originPatterns.add(renderEnvOrigin);
         }
         
-        // Explicitly authorizing Vercel URL
-        config.addAllowedOrigin("https://lifeconnect-kappa.vercel.app");
-        
-        // Temporarily allow local for development bypasses just in case
-        config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOrigin("http://localhost:5174");
-
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("*"));
+        // Use origin patterns to avoid allowCredentials conflicts
+        config.setAllowedOriginPatterns(originPatterns);
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        return source;
     }
 }
