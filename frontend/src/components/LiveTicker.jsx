@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-
-const API_RECENT_URL = 'http://localhost:8080/api/donors/recent';
+import { apiFetch } from '../utils/api';
 
 const LiveTicker = () => {
   const [liveEvents, setLiveEvents] = useState([
@@ -13,7 +12,7 @@ const LiveTicker = () => {
   useEffect(() => {
     const fetchRecentDonors = async () => {
       try {
-        const response = await fetch(API_RECENT_URL);
+        const response = await apiFetch('/api/donors/recent');
         if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();
         
