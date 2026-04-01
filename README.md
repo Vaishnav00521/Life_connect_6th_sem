@@ -121,6 +121,6 @@ Access the Swagger UI here: 👉 `http://localhost:8080/swagger-ui/index.html`
 **Vaishnav Shah**  
 *B.Tech Computer Science Engineering | Microsoft Industry Embedded Program*  
 
-[LinkedIn](https://linkedin.com/in/your-profile-link) | [GitHub](https://github.com/Vaishnav00521)
+[LinkedIn](https://linkedin.com/in/vaishnav-shah005) | [GitHub](https://github.com/Vaishnav00521)
 <br/>
 *Built with ❤️ to save lives.*
