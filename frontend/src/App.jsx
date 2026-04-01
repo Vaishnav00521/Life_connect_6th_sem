@@ -4,7 +4,7 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import toast from 'react-hot-toast';
 import { AlertTriangle } from 'lucide-react';
-import { getWsBaseUrl } from './utils/api';
+
 
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
@@ -25,7 +25,14 @@ import AnalyticsNodePage from './pages/AnalyticsNodePage';
 
 const App = () => {
   useEffect(() => {
-    const socket = new SockJS(getWsBaseUrl());
+    const rawSocketUrl = import.meta.env.VITE_WS_BASE_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    const safeSocketUrl = rawSocketUrl.replace(/^wss?:\/\//, function(match) {
+      return match === 'wss://' ? 'https://' : 'http://';
+    });
+    
+    // Append the explicit STOMP endpoint path
+    const finalUrl = safeSocketUrl.endsWith('/ws-lifeconnect') ? safeSocketUrl : `${safeSocketUrl}/ws-lifeconnect`;
+    const socket = new SockJS(finalUrl);
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
