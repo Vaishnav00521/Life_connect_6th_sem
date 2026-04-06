@@ -136,7 +136,11 @@ const BloodDonationForm = () => {
         const response = await apiFetch('/api/registration/blood', { method: 'POST', body: JSON.stringify(payload) });
         if (!response.ok) {
           let errorMsg = "Something went wrong. Please try again.";
-          try { const result = await response.json(); errorMsg = result.message || errorMsg; } catch (e) { /* ignore json parse error */ }
+          try {
+            const textResponse = await response.text();
+            try { errorMsg = JSON.parse(textResponse).message || textResponse; }
+            catch (e) { errorMsg = textResponse || errorMsg; }
+          } catch (e) { /* ignore */ }
           throw new Error(errorMsg);
         }
         const result = await response.json();
@@ -355,7 +359,11 @@ const OrganPledgeForm = () => {
         const response = await apiFetch('/api/registration/organ', { method: 'POST', body: JSON.stringify(payload) });
         if (!response.ok) {
           let errorMsg = "Something went wrong.";
-          try { const result = await response.json(); errorMsg = result.message || errorMsg; } catch (e) { /* ignore json parse error */ }
+          try {
+            const textResponse = await response.text();
+            try { errorMsg = JSON.parse(textResponse).message || textResponse; }
+            catch (e) { errorMsg = textResponse || errorMsg; }
+          } catch (e) { /* ignore */ }
           throw new Error(errorMsg);
         }
         const result = await response.json();
