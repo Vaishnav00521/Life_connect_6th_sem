@@ -1,0 +1,14 @@
+# Don't send these to Docker — keeps the build fast
+frontend/
+.git/
+.idea/
+.vscode/
+.settings/
+target/
+*.md
+*.iml
+.gitignore
+.gitattributes
+.classpath
+.project
+.factorypath

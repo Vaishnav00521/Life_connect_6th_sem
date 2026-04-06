@@ -1,0 +1,66 @@
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  LifeConnect — PRODUCTION Configuration                        ║
+# ║  Activated by: -Dspring.profiles.active=prod                   ║
+# ║  All secrets come from Render's Environment Variables.         ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# ──────────────── Server ────────────────
+server:
+  port: ${PORT:8080}
+
+# ──────────────── Database (Supabase PostgreSQL) ────────────────
+# IMPORTANT — Supabase Connection Pooling:
+# On Render, set DB_URL to the Supabase PgBouncer (port 6543) URL:
+#   jdbc:postgresql://db.<YOUR-PROJECT-REF>.supabase.co:6543/postgres?pgbouncer=true&prepareThreshold=0
+#
+# The "pgbouncer=true&prepareThreshold=0" params are REQUIRED.
+# Without them, PgBouncer will reject prepared statements and your app will crash.
+# Port 5432 = direct connection (fine for dev). Port 6543 = pooled (required for prod).
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      connection-timeout: 20000
+
+  # ──────────────── Hibernate ────────────────
+  # CRITICAL: 'validate' checks schema matches entities but NEVER modifies tables.
+  # Use 'none' if you don't want any validation overhead.
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+  # ──────────────── Email ────────────────
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ──────────────── Logging (Production — minimal) ────────────────
+logging:
+  level:
+    root: WARN
+    com.lifeconnect: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type: WARN

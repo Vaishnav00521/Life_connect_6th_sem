@@ -11,14 +11,16 @@ import java.util.List;
 public interface DonorRepository extends JpaRepository<Donor, Long> {
 
     // 1. The Core Geospatial Engine
-    @Query(value = "SELECT *, " +
+    @Query(value = "SELECT * FROM (" +
+            "SELECT *, " +
             "(6371 * acos(cos(radians(:searchLat)) * cos(radians(latitude)) * " +
             "cos(radians(longitude) - radians(:searchLng)) + " +
             "sin(radians(:searchLat)) * sin(radians(latitude)))) AS calculated_distance " +
             "FROM donors " +
             "WHERE (:bloodGroup IS NULL OR :bloodGroup = '' OR blood_group = :bloodGroup) " +
-            "HAVING calculated_distance < :maxRadius " +
-            "ORDER BY calculated_distance ASC",
+            ") AS sub " +
+            "WHERE sub.calculated_distance < :maxRadius " +
+            "ORDER BY sub.calculated_distance ASC",
             nativeQuery = true)
     List<Donor> findNearestDonors(
             @Param("bloodGroup") String bloodGroup,
