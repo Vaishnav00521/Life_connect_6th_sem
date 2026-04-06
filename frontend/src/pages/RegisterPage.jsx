@@ -134,8 +134,12 @@ const BloodDonationForm = () => {
       try {
         const payload = { ...data, latitude: position.coords.latitude, longitude: position.coords.longitude };
         const response = await apiFetch('/api/registration/blood', { method: 'POST', body: JSON.stringify(payload) });
+        if (!response.ok) {
+          let errorMsg = "Something went wrong. Please try again.";
+          try { const result = await response.json(); errorMsg = result.message || errorMsg; } catch (e) { /* ignore json parse error */ }
+          throw new Error(errorMsg);
+        }
         const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Something went wrong. Please try again.");
         toast.success("You're registered! A doctor will complete the checkup. Thank you! 🎉");
         navigate('/dashboard');
       } catch (error) {
@@ -349,8 +353,12 @@ const OrganPledgeForm = () => {
         };
         delete payload.pledgeOrgans; delete payload.pledgeTissues; delete payload.pledgeAll;
         const response = await apiFetch('/api/registration/organ', { method: 'POST', body: JSON.stringify(payload) });
+        if (!response.ok) {
+          let errorMsg = "Something went wrong.";
+          try { const result = await response.json(); errorMsg = result.message || errorMsg; } catch (e) { /* ignore json parse error */ }
+          throw new Error(errorMsg);
+        }
         const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Something went wrong.");
         toast.success("Your organ pledge is registered! You are a hero! 🌟");
         navigate('/organ-node');
       } catch (error) {

@@ -59,7 +59,7 @@ public class SecurityConfig {
                 // Allow all preflight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Public API endpoints — no login required
-                .requestMatchers("/", "/api/health").permitAll()
+                .requestMatchers("/api/registration/**", "/api/health").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 // WebSocket
                 .requestMatchers("/ws-lifeconnect/**").permitAll()
@@ -83,6 +83,7 @@ public class SecurityConfig {
         boolean isProd = Arrays.asList(env.getActiveProfiles()).contains("prod");
 
         if (isProd) {
+            originPatterns.add("https://lifeconnect-kappa.vercel.app");
             originPatterns.add("https://*.vercel.app");
             if (frontendUrl != null && !frontendUrl.isBlank()) {
                 originPatterns.add(frontendUrl);
@@ -92,6 +93,7 @@ public class SecurityConfig {
             originPatterns.add("http://localhost:5173");
             originPatterns.add("http://localhost:5174");
             originPatterns.add("http://localhost:3000");
+            originPatterns.add("https://lifeconnect-kappa.vercel.app");
             originPatterns.add("https://*.vercel.app");
             if (frontendUrl != null && !frontendUrl.isBlank()) {
                 originPatterns.add(frontendUrl);
