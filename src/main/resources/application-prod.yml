@@ -48,6 +48,7 @@ spring:
   # Don't use 'validate' unless you're 100% sure your entities match the DB exactly.
   # Don't use 'update' — it WILL try to ALTER tables and can wipe data.
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none
     show-sql: false
