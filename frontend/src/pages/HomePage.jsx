@@ -393,18 +393,20 @@ const HomePage = () => {
                 style={{ background: 'radial-gradient(circle, rgba(0,200,190,0.15) 0%, rgba(160,100,220,0.08) 40%, transparent 70%)' }}
               />
 
-              {/* Heart image — heartbeat animation */}
+              {/* Heart image — heartbeat animation (only the heart pumps, no box) */}
               <motion.img
                 src="/hero-heart.png"
                 alt="LifeConnect — Saving lives 24/7"
-                className="w-full h-full object-contain rounded-2xl"
-                style={{ filter: 'drop-shadow(0 20px 60px rgba(0,0,0,0.35)) drop-shadow(0 0 30px rgba(0,200,190,0.12))' }}
+                className="w-full h-full object-contain"
+                style={{
+                  filter: 'drop-shadow(0 15px 40px rgba(0,0,0,0.3)) drop-shadow(0 0 20px rgba(0,200,190,0.1))',
+                  background: 'transparent',
+                }}
                 animate={{
-                  scale: [1, 1.04, 1, 1.05, 1],
-                  y: [0, -3, 0, -4, 0],
+                  scale: [1, 1.06, 1, 1.07, 1],
                 }}
                 transition={{
-                  duration: 2, repeat: Infinity, ease: "easeInOut",
+                  duration: 1.8, repeat: Infinity, ease: "easeInOut",
                   times: [0, 0.15, 0.35, 0.45, 1],
                 }}
               />
