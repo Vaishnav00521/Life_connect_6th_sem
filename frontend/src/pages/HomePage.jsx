@@ -356,67 +356,128 @@ const HomePage = () => {
             background: 'radial-gradient(circle at 50% 50%, rgba(0,210,200,0.06) 0%, rgba(160,100,220,0.03) 30%, transparent 60%)'
           }} />
 
-          {/* ★ CENTRAL HEART GRAPHIC ★ */}
+          {/* ★ CENTRAL HEART — Pure SVG, no image box ★ */}
           <motion.div
             initial={{ scale: 0.3, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', bounce: 0.2, duration: 1.4, delay: 0.3 }}
-            className="relative z-10 w-[250px] h-[250px] sm:w-[290px] sm:h-[290px] md:w-[330px] md:h-[330px] lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px]"
+            className="relative z-10 w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] md:w-[350px] md:h-[350px] lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px]"
           >
-            <div className="relative w-full h-full">
-              {/* Holographic outer ring */}
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Pulse rings expanding outward */}
+              <motion.div className="absolute inset-[-6%] rounded-full border border-white/10 pointer-events-none"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div className="absolute inset-[-14%] rounded-full border border-white/[0.06] pointer-events-none"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0, 0.2] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+              />
+              <motion.div className="absolute inset-[-22%] rounded-full border border-white/[0.03] pointer-events-none"
+                animate={{ scale: [1, 1.18, 1], opacity: [0.12, 0, 0.12] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+              />
+
+              {/* Glow haze behind heart */}
+              <div className="absolute inset-[-20%] rounded-full pointer-events-none opacity-50 blur-3xl"
+                style={{ background: 'radial-gradient(circle, rgba(255,120,120,0.25) 0%, rgba(200,50,50,0.1) 40%, transparent 70%)' }}
+              />
+
+              {/* ═══ THE HEART — Pure SVG ═══ */}
               <motion.div
-                className="absolute -inset-[15%] rounded-full pointer-events-none"
-                style={{
-                  background: 'conic-gradient(from 0deg, rgba(0,210,200,0.08), rgba(160,100,220,0.06), rgba(213,19,23,0.04), rgba(0,210,200,0.08))',
-                }}
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              />
-
-              {/* Pulse rings */}
-              <motion.div className="absolute -inset-[6%] rounded-full border border-white/10 pointer-events-none"
-                animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <motion.div className="absolute -inset-[12%] rounded-full border border-teal-400/10 pointer-events-none"
-                animate={{ scale: [1, 1.18, 1], opacity: [0.2, 0, 0.2] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-              />
-              <motion.div className="absolute -inset-[20%] rounded-full border border-purple-400/5 pointer-events-none"
-                animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0, 0.15] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-              />
-
-              {/* Teal + purple glow haze */}
-              <div className="absolute -inset-16 rounded-full pointer-events-none opacity-40 blur-3xl"
-                style={{ background: 'radial-gradient(circle, rgba(0,200,190,0.15) 0%, rgba(160,100,220,0.08) 40%, transparent 70%)' }}
-              />
-
-              {/* Heart image — heartbeat animation (only the heart pumps, no box) */}
-              <motion.img
-                src="/hero-heart.png"
-                alt="LifeConnect — Saving lives 24/7"
-                className="w-full h-full object-contain"
-                style={{
-                  filter: 'drop-shadow(0 15px 40px rgba(0,0,0,0.3)) drop-shadow(0 0 20px rgba(0,200,190,0.1))',
-                  background: 'transparent',
-                }}
+                className="w-[85%] h-[85%]"
                 animate={{
-                  scale: [1, 1.06, 1, 1.07, 1],
+                  scale: [1, 1.08, 1, 1.10, 1],
                 }}
                 transition={{
-                  duration: 1.8, repeat: Infinity, ease: "easeInOut",
-                  times: [0, 0.15, 0.35, 0.45, 1],
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  times: [0, 0.12, 0.3, 0.42, 1],
                 }}
-              />
+                style={{ filter: 'drop-shadow(0 12px 35px rgba(0,0,0,0.35))' }}
+              >
+                <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                  <defs>
+                    {/* Layer gradients — dark to light */}
+                    <linearGradient id="heart-l1" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#7a0a0c" />
+                      <stop offset="100%" stopColor="#5c0608" />
+                    </linearGradient>
+                    <linearGradient id="heart-l2" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#9b1215" />
+                      <stop offset="100%" stopColor="#7d0d10" />
+                    </linearGradient>
+                    <linearGradient id="heart-l3" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#c41a1e" />
+                      <stop offset="100%" stopColor="#a51418" />
+                    </linearGradient>
+                    <linearGradient id="heart-l4" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#e8282e" />
+                      <stop offset="100%" stopColor="#d51f24" />
+                    </linearGradient>
+                    <linearGradient id="heart-l5" x1="0.2" y1="0" x2="0.8" y2="1">
+                      <stop offset="0%" stopColor="#ff4a52" />
+                      <stop offset="100%" stopColor="#e83038" />
+                    </linearGradient>
+                    {/* Center glow */}
+                    <radialGradient id="center-glow">
+                      <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                    </radialGradient>
+                    {/* Shadow filter */}
+                    <filter id="layer-shadow" x="-10%" y="-10%" width="120%" height="130%">
+                      <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.25" />
+                    </filter>
+                    <filter id="inner-shadow" x="-10%" y="-10%" width="120%" height="130%">
+                      <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
+                    </filter>
+                  </defs>
 
-              {/* Subtle light emission synced with heartbeat */}
+                  {/* LAYER 1 — Outermost (darkest) */}
+                  <path d="M256 462 C256 462 42 310 42 168 C42 96 100 42 164 42 C210 42 242 72 256 96 C270 72 302 42 348 42 C412 42 470 96 470 168 C470 310 256 462 256 462Z"
+                    fill="url(#heart-l1)" filter="url(#layer-shadow)" />
+
+                  {/* LAYER 2 */}
+                  <path d="M256 430 C256 430 72 296 72 178 C72 116 120 72 174 72 C214 72 242 96 256 116 C270 96 298 72 338 72 C392 72 440 116 440 178 C440 296 256 430 256 430Z"
+                    fill="url(#heart-l2)" filter="url(#inner-shadow)" />
+
+                  {/* LAYER 3 */}
+                  <path d="M256 398 C256 398 102 282 102 188 C102 136 140 100 184 100 C218 100 244 118 256 136 C268 118 294 100 328 100 C372 100 410 136 410 188 C410 282 256 398 256 398Z"
+                    fill="url(#heart-l3)" filter="url(#inner-shadow)" />
+
+                  {/* LAYER 4 */}
+                  <path d="M256 365 C256 365 132 268 132 198 C132 155 162 128 196 128 C224 128 246 142 256 156 C266 142 288 128 316 128 C350 128 380 155 380 198 C380 268 256 365 256 365Z"
+                    fill="url(#heart-l4)" filter="url(#inner-shadow)" />
+
+                  {/* LAYER 5 — Innermost (brightest) */}
+                  <path d="M256 330 C256 330 162 255 162 208 C162 175 184 155 210 155 C232 155 248 166 256 178 C264 166 280 155 302 155 C328 155 350 175 350 208 C350 255 256 330 256 330Z"
+                    fill="url(#heart-l5)" filter="url(#inner-shadow)" />
+
+                  {/* Center highlight */}
+                  <ellipse cx="256" cy="220" rx="60" ry="50" fill="url(#center-glow)" />
+
+                  {/* ──── Blood Drop Icon ──── */}
+                  <g transform="translate(256, 235)" className="animate-pulse">
+                    <path d="M0 -42 C-4 -30 -22 -6 -22 10 C-22 22 -12 32 0 32 C12 32 22 22 22 10 C22 -6 4 -30 0 -42Z"
+                      fill="white" fillOpacity="0.95" />
+                  </g>
+
+                  {/* ──── ECG / Heartbeat Line ──── */}
+                  <polyline
+                    points="190,240 215,240 225,240 232,220 240,258 248,228 254,250 260,240 275,240 290,240"
+                    stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"
+                    opacity="0.9"
+                  />
+                </svg>
+              </motion.div>
+
+              {/* Glow flash synced with heartbeat */}
               <motion.div
-                className="absolute inset-[20%] rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }}
-                animate={{ opacity: [0.3, 0.8, 0.3, 0.9, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", times: [0, 0.15, 0.35, 0.45, 1] }}
+                className="absolute inset-[15%] rounded-full pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(255,180,180,0.12) 0%, transparent 65%)' }}
+                animate={{ opacity: [0.2, 0.7, 0.2, 0.8, 0.2], scale: [1, 1.05, 1, 1.06, 1] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", times: [0, 0.12, 0.3, 0.42, 1] }}
               />
             </div>
           </motion.div>
