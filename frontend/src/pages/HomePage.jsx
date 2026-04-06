@@ -383,19 +383,20 @@ const HomePage = () => {
                 style={{ background: 'radial-gradient(circle, rgba(255,120,120,0.25) 0%, rgba(200,50,50,0.1) 40%, transparent 70%)' }}
               />
 
-              {/* ═══ THE HEART — Pure SVG ═══ */}
+              {/* ═══ THE HEART — Pure SVG with smooth heartbeat ═══ */}
               <motion.div
                 className="w-[85%] h-[85%]"
                 animate={{
-                  scale: [1, 1.08, 1, 1.10, 1],
+                  scale: [1, 1.05, 0.98, 1.04, 1],
                 }}
                 transition={{
-                  duration: 1.6,
+                  duration: 1.2,
                   repeat: Infinity,
-                  ease: "easeInOut",
-                  times: [0, 0.12, 0.3, 0.42, 1],
+                  repeatDelay: 0.6,
+                  ease: [0.22, 0.68, 0.36, 1.0],
+                  times: [0, 0.18, 0.36, 0.52, 1],
                 }}
-                style={{ filter: 'drop-shadow(0 12px 35px rgba(0,0,0,0.35))' }}
+                style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}
               >
                 <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                   <defs>
@@ -472,12 +473,12 @@ const HomePage = () => {
                 </svg>
               </motion.div>
 
-              {/* Glow flash synced with heartbeat */}
+              {/* Glow flash synced with smooth heartbeat */}
               <motion.div
                 className="absolute inset-[15%] rounded-full pointer-events-none"
                 style={{ background: 'radial-gradient(circle, rgba(255,180,180,0.12) 0%, transparent 65%)' }}
-                animate={{ opacity: [0.2, 0.7, 0.2, 0.8, 0.2], scale: [1, 1.05, 1, 1.06, 1] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", times: [0, 0.12, 0.3, 0.42, 1] }}
+                animate={{ opacity: [0.15, 0.6, 0.15, 0.5, 0.15], scale: [1, 1.03, 1, 1.02, 1] }}
+                transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 0.6, ease: "easeInOut", times: [0, 0.18, 0.36, 0.52, 1] }}
               />
             </div>
           </motion.div>
