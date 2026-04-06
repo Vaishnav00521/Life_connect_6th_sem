@@ -64,19 +64,19 @@ public class BloodDonation {
     private Boolean currentlyOnMedication;
 
     // ──── "For the Doctor Only" ────
-    @Column(name = "weight_kg")
+    @Column(name = "weight_kg", nullable = true)
     private Double weightKg;
 
-    @Column(name = "blood_pressure")
+    @Column(name = "blood_pressure", nullable = true)
     private String bloodPressure;
 
-    @Column(name = "pulse_rate")
+    @Column(name = "pulse_rate", nullable = true)
     private Integer pulseRate;
 
-    @Column(name = "hemoglobin_level")
+    @Column(name = "hemoglobin_level", nullable = true)
     private Double hemoglobinLevel;
 
-    @Column(name = "body_temp")
+    @Column(name = "body_temp", nullable = true)
     private Double bodyTemp;
 
     // ──── Consents ────

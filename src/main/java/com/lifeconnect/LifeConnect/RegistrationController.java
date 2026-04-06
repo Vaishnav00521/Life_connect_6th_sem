@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Map;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @RestController
 @RequestMapping("/api/registration")
@@ -84,6 +85,9 @@ public class RegistrationController {
                 "id", saved.getId().toString()
             ));
 
+        } catch (DataIntegrityViolationException e) {
+            String cause = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
+            return ResponseEntity.badRequest().body(Map.of("message", "Database Error: " + cause));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Something went wrong: " + e.getMessage()));
@@ -156,6 +160,9 @@ public class RegistrationController {
                 "id", saved.getId().toString()
             ));
 
+        } catch (DataIntegrityViolationException e) {
+            String cause = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
+            return ResponseEntity.badRequest().body(Map.of("message", "Database Error: " + cause));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Something went wrong: " + e.getMessage()));
