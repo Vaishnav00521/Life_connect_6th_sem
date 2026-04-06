@@ -1,12 +1,11 @@
 package com.lifeconnect.LifeConnect;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -16,61 +15,57 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.core.Ordered;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${FRONTEND_URL:}")
-    private String frontendUrl;
-
-    private final Environment env;
-
-    public SecurityConfig(Environment env) {
-        this.env = env;
-    }
-
     // ════════════════════════════════════════════════════════
-    // FIX 1: Register CORS filter at HIGHEST priority.
+    // Register CORS filter at HIGHEST priority.
     // This ensures preflight OPTIONS requests are handled
-    // BEFORE Spring Security blocks them with a 403.
+    // BEFORE Spring Security blocks them.
     // ════════════════════════════════════════════════════════
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
         FilterRegistrationBean<CorsFilter> bean =
                 new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE); // Run before Security
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // FIX 2: Use the corsConfigurationSource bean directly
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // FIX 3: CSRF disabled — this is a stateless REST API
-            .csrf(csrf -> csrf.disable())
-            // FIX 4: Stateless session — no cookies/sessions needed
+            // 1. CORS must be first
+            .cors(c -> c.configurationSource(corsConfigurationSource()))
+            
+            // 2. Explicitly disable CSRF for stateless REST API
+            .csrf(AbstractHttpConfigurer::disable)
+            
+            // 3. Stateless session policy
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // 4. Endpoint Authorization
             .authorizeHttpRequests(auth -> auth
-                // Allow all preflight OPTIONS requests
+                // Allow all preflight OPTIONS requests globally
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Public API endpoints — no login required
+                
+                // Explicitly whitelist the registration and health endpoints
                 .requestMatchers("/api/registration/**", "/api/health").permitAll()
+                
+                // Allow other API usages (if any public, keep it open)
                 .requestMatchers("/api/**").permitAll()
-                // WebSocket
+                
+                // WebSocket and UI Documentations
                 .requestMatchers("/ws-lifeconnect/**").permitAll()
-                // Swagger
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // Everything else requires auth
+                
+                // Require auth for anything else remaining
                 .anyRequest().authenticated()
             )
-            // Disable Spring's default login pages
-            .httpBasic(basic -> basic.disable())
-            .formLogin(form -> form.disable());
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -79,37 +74,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        List<String> originPatterns = new ArrayList<>();
-        boolean isProd = Arrays.asList(env.getActiveProfiles()).contains("prod");
-
-        if (isProd) {
-            originPatterns.add("https://lifeconnect-kappa.vercel.app");
-            originPatterns.add("https://*.vercel.app");
-            if (frontendUrl != null && !frontendUrl.isBlank()) {
-                originPatterns.add(frontendUrl);
-            }
-        } else {
-            // DEV: allow localhost
-            originPatterns.add("http://localhost:5173");
-            originPatterns.add("http://localhost:5174");
-            originPatterns.add("http://localhost:3000");
-            originPatterns.add("https://lifeconnect-kappa.vercel.app");
-            originPatterns.add("https://*.vercel.app");
-            if (frontendUrl != null && !frontendUrl.isBlank()) {
-                originPatterns.add(frontendUrl);
-            }
-        }
-
-        config.setAllowedOriginPatterns(originPatterns);
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        // FIX 5: Explicitly list headers that the browser sends
-        config.setAllowedHeaders(Arrays.asList(
-            "Authorization", "Content-Type", "Accept", "Origin",
-            "X-Requested-With", "Cache-Control"
+        // Must explicitly include EXACT origins when allowCredentials is true
+        config.setAllowedOrigins(Arrays.asList(
+            "https://lifeconnect-kappa.vercel.app",
+            "http://localhost:5173"
         ));
-        config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(true);
-        // FIX 6: Cache preflight for 1 hour (reduces OPTIONS calls)
+
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
+        config.setAllowCredentials(true);             // Crucial for cross-origin POSTs
+
+        // Optional: Cache preflight requests for 1 hour to reduce network traffic
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
