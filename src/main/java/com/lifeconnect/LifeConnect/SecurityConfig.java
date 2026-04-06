@@ -59,6 +59,7 @@ public class SecurityConfig {
                 // Allow all preflight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Public API endpoints — no login required
+                .requestMatchers("/", "/api/health").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 // WebSocket
                 .requestMatchers("/ws-lifeconnect/**").permitAll()
