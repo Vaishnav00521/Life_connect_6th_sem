@@ -35,10 +35,11 @@ ENV PORT=8080
 EXPOSE ${PORT}
 
 # JVM flags for containers: respect memory limits, faster startup
-ENTRYPOINT ["java", \
-  "-XX:+UseContainerSupport", \
-  "-XX:MaxRAMPercentage=75.0", \
-  "-Djava.security.egd=file:/dev/./urandom", \
-  "-Dspring.profiles.active=prod", \
-  "-Dserver.port=${PORT}", \
-  "-jar", "app.jar"]
+# IMPORTANT: Use shell form (not JSON array) so ${PORT} gets expanded at runtime.
+ENTRYPOINT java \
+  -XX:+UseContainerSupport \
+  -XX:MaxRAMPercentage=75.0 \
+  -Djava.security.egd=file:/dev/./urandom \
+  -Dspring.profiles.active=prod \
+  -Dserver.port=${PORT} \
+  -jar app.jar

@@ -5,17 +5,31 @@
 # ╚══════════════════════════════════════════════════════════════════╝
 
 # ──────────────── Server ────────────────
+# Render injects a PORT env variable. Spring Boot will read it automatically.
 server:
   port: ${PORT:8080}
 
 # ──────────────── Database (Supabase PostgreSQL) ────────────────
-# IMPORTANT — Supabase Connection Pooling:
-# On Render, set DB_URL to the Supabase PgBouncer (port 6543) URL:
-#   jdbc:postgresql://db.<YOUR-PROJECT-REF>.supabase.co:6543/postgres?pgbouncer=true&prepareThreshold=0
 #
-# The "pgbouncer=true&prepareThreshold=0" params are REQUIRED.
-# Without them, PgBouncer will reject prepared statements and your app will crash.
-# Port 5432 = direct connection (fine for dev). Port 6543 = pooled (required for prod).
+# HOW TO SET DB_URL IN RENDER'S DASHBOARD:
+# ─────────────────────────────────────────
+# 1. Go to Supabase Dashboard → Settings → Database → Connection Pooling
+# 2. Copy the "Transaction" mode URI (Port 6543)
+# 3. Prepend "jdbc:" to it
+# 4. Append "?prepareThreshold=0" to the end
+#
+# FINAL FORMAT (paste this into Render's DB_URL env var):
+#   jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
+#
+# WHY prepareThreshold=0?
+#   Supabase uses PgBouncer in front of PostgreSQL. PgBouncer does NOT support
+#   prepared statements. Without this flag, Hibernate will try to use prepared
+#   statements and your app will crash with "prepared statement does not exist".
+#
+# WHY Port 6543 instead of 5432?
+#   Port 5432 = direct connection (fine for local dev, but limited to ~20 connections)
+#   Port 6543 = pooled via PgBouncer (required for production, supports hundreds)
+#
 spring:
   datasource:
     url: ${DB_URL}
@@ -23,21 +37,26 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: 5
+      minimum-idle: 1
       idle-timeout: 30000
       connection-timeout: 20000
+      leak-detection-threshold: 60000
 
   # ──────────────── Hibernate ────────────────
-  # CRITICAL: 'validate' checks schema matches entities but NEVER modifies tables.
-  # Use 'none' if you don't want any validation overhead.
+  # 'none' = don't touch the database schema at all. Safest for production.
+  # Don't use 'validate' unless you're 100% sure your entities match the DB exactly.
+  # Don't use 'update' — it WILL try to ALTER tables and can wipe data.
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: false
+    # NOTE: Do NOT set hibernate.dialect manually.
+    # Hibernate 6+ auto-detects PostgreSQLDialect from the JDBC URL.
+    # Setting it explicitly causes the warning:
+    #   "PostgreSQLDialect does not need to be specified explicitly"
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
         jdbc:
           lob:
