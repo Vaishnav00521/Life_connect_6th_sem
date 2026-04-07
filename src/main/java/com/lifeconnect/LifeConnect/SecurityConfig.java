@@ -51,6 +51,9 @@ public class SecurityConfig {
                 // Allow all preflight OPTIONS requests globally
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 
+                // Allow root access (Welcome message), favicon, and error pages globally
+                .requestMatchers("/", "", "/favicon.ico", "/error").permitAll()
+                
                 // Explicitly whitelist the registration and health endpoints
                 .requestMatchers("/api/registration/**", "/api/health").permitAll()
                 
